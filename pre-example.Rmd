@@ -1,0 +1,107 @@
+
+```{r}
+rm(list=ls())
+setwd("C:/Users/Lenovo/Code/R/sparse-convex-clustering/scvxclustr/example")
+set.seed(123)
+
+# Load scvxclustr package
+library(devtools)
+library(scvxclustr)
+
+# load necessary functions
+source("util.R")
+
+
+```
+
+
+```{r}
+method = "ama"  # Fitted method (method = "ama", "admm")
+n = 144          # Sample size
+true_p = 13    # Number of true features
+p = 90        # Number of total features (p = 150, 500)
+k = 6           # Number of true cluster
+# Simiulate 4 cluster Gaussian data
+data <- read.csv("movement_libras_selected.csv",head=F)
+X=data[1:144,1:90]
+y=data[1:144,91]
+```
+
+```{r}
+#standardize n by p data matrix
+X <- scale(X,center=TRUE,scale=FALSE)
+```
+
+
+```{r}
+# Adaptive Weight (if possible)
+g1 <-20
+g2 <- 0
+Gamma2.weight <- c(rep(0.5, true_p), rep(1,p - true_p) )
+k_w <- 5    # Number of nearest neighbors
+phi <- 0.5  # scale of the kernel
+verbose <- TRUE # show more information
+w <- dist_weight( t(X) / sqrt(p),phi, dist.type = "euclidean", p = 2 )
+w <- knn_weights(w,k = k_w,n)
+nu <-1/n #AMA_step_size(w,n) /2
+```
+
+```{r}
+## Validate the cvxclust and scvxclust is the same when g2 = 0
+# Fit a convex clustering model
+fit1 <- cvxclust(X = t(X), w = w, gamma = g1, method = "ama", nu = nu, max_iter = 10000, tol = 1e-5)
+```
+
+```{r}
+# Fit a sparce convex clsutering model
+fit2 <- scvxclust(X = X, w = w, Gamma1 = g1, Gamma2 = g2, Gamma2_weight = Gamma2.weight, method = method, nu = nu, max_iter = 10000, tol_abs = 1e-5)
+```
+
+```{r}
+## Validate the sparse convex clustring model create a correct clustering structure under the toy exmaple.
+g1 <- 10
+g2 <- 2
+fit3<- scvxclust(X = X, w = w, Gamma1 = g1, Gamma2 = g2, Gamma2_weight = Gamma2.weight, method = method, nu = nu, max_iter = 10000, tol_abs = 1e-5)
+
+```
+
+```{r}
+write.csv(t(fit1$U[[1]]),file = 'fit1.csv')
+```
+
+```{r}
+write.csv(fit2$U[[1]],file = 'fit2.csv')
+```
+
+```{r}
+write.csv(fit3$U[[1]],file = 'fit3.csv')
+```
+
+
+```{r}
+write.csv(X,file = 'X.csv')
+```
+
+
+```{r}
+#稀疏凸聚类和凸聚类的效果对比(g2=0时)几乎一致
+diff_U <- as.numeric(fit1$U[[1]] - t(fit2$U[[1]]) )
+summary( diff_U )
+plot(diff_U)
+```
+```{r}
+#稀疏凸聚类和凸聚类的效果对比(g2!=0时)相差很大
+diff_U <- as.numeric(fit1$U[[1]] - t(fit3$U[[1]]) )
+summary( diff_U )
+plot(diff_U)
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
