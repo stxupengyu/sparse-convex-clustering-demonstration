@@ -13,5 +13,7 @@ https://github.com/elong0527/scvxclustr
 7.大概是这么个安装逻辑，如果中间出现报错可以再在google、百度上找找解决方法。  
 ****
 文件说明：  
-toy_example为原作者给出的参考代码。为了方便展示和学习，本人对toy_example进行改进，形成了pre.Rmd。movement_libras_selected为一个手部运动数据集，我们参考pre.Rmd，在pre-example.Rmd里进行聚类展示。rand_index.ipynb为用python进行的数据可视化以及rand index值的计算。
+toy_example为原作者给出的参考代码。为了方便展示和学习，本人对toy_example进行改进，形成了pre.Rmd。movement_libras_selected为一个手部运动数据集，我们参考pre.Rmd，在pre-example.Rmd里进行聚类展示。rand_index.ipynb为用python进行的数据可视化以及rand index值的计算,util.R为原作者提供的文件，里面有几个集成好的函数以供调用。  
+****
+详细的展示请参考文件：稀疏凸聚类学习报告.pdf中的第五节：代码复现。  
 
